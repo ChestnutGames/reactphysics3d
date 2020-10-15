@@ -242,8 +242,42 @@ set (REACTPHYSICS3D_SOURCES
     "src/utils/DebugRenderer.cpp"
 )
 
+set (LIBFIXEDPTMATH_CORE
+	./libfixmath/fix16.h
+	./libfixmath/fix16.c 
+	./libfixmath/fix16_exp.c 
+	./libfixmath/fix16_sqrt.c 
+	./libfixmath/fix16_str.c 
+	./libfixmath/fix16_trig.c 
+	./libfixmath/fract32.c 
+	./libfixmath/uint32.c
+)
+set (PATCH_CORE ./patch/b3r32.h ./patch/b3r32.cpp ./patch/lua-reactphysics3d.cpp)
+
+macro(source_group_by_dir proj_dir source_files)
+    if(MSVC OR APPLE)
+        get_filename_component(sgbd_cur_dir ${proj_dir} ABSOLUTE)
+        foreach(sgbd_file ${${source_files}})
+			get_filename_component(sgbd_abs_file ${sgbd_file} ABSOLUTE)
+            file(RELATIVE_PATH sgbd_fpath ${sgbd_cur_dir} ${sgbd_abs_file})
+            string(REGEX REPLACE "\(.*\)/.*" \\1 sgbd_group_name ${sgbd_fpath})
+            string(COMPARE EQUAL ${sgbd_fpath} ${sgbd_group_name} sgbd_nogroup)
+            string(REPLACE "/" "\\" sgbd_group_name ${sgbd_group_name})
+            if(sgbd_nogroup)
+                set(sgbd_group_name "\\")
+            endif(sgbd_nogroup)
+            source_group(${sgbd_group_name} FILES ${sgbd_file})
+        endforeach(sgbd_file)
+    endif(MSVC OR APPLE)
+endmacro(source_group_by_dir)
+
+source_group_by_dir(${CMAKE_CURRENT_SOURCE_DIR} REACTPHYSICS3D_HEADERS)
+source_group_by_dir(${CMAKE_CURRENT_SOURCE_DIR} REACTPHYSICS3D_SOURCES)
+source_group_by_dir(${CMAKE_CURRENT_SOURCE_DIR} LIBFIXEDPTMATH_CORE)
+source_group_by_dir(${CMAKE_CURRENT_SOURCE_DIR} PATCH_CORE)
+
 # Create the library
-add_library(reactphysics3d ${REACTPHYSICS3D_HEADERS} ${REACTPHYSICS3D_SOURCES})
+add_library(reactphysics3d ${REACTPHYSICS3D_HEADERS} ${REACTPHYSICS3D_SOURCES} ${LIBFIXEDPTMATH_CORE} ${PATCH_CORE})
 
 # Creates an Alias Target, such that "ReactPhysics3D::reactphysics3d" can be used
 # to refer to "reactphysics3d" in subsequent commands
@@ -262,6 +296,9 @@ target_compile_options(reactphysics3d PRIVATE
 # Library headers
 target_include_directories(reactphysics3d PUBLIC
               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+              $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/3rd>
+              $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/3rd/lua/src>
+              $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libfixmath>
               $<INSTALL_INTERFACE:include>
 )
 
