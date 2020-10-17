@@ -252,6 +252,7 @@ set (LIBFIXEDPTMATH_CORE
 	./libfixmath/fract32.c 
 	./libfixmath/uint32.c
 )
+
 set (PATCH_CORE ./patch/b3r32.h ./patch/b3r32.cpp ./patch/lua-reactphysics3d.cpp)
 
 macro(source_group_by_dir proj_dir source_files)
@@ -277,7 +278,7 @@ source_group_by_dir(${CMAKE_CURRENT_SOURCE_DIR} LIBFIXEDPTMATH_CORE)
 source_group_by_dir(${CMAKE_CURRENT_SOURCE_DIR} PATCH_CORE)
 
 # Create the library
-add_library(reactphysics3d ${REACTPHYSICS3D_HEADERS} ${REACTPHYSICS3D_SOURCES} ${LIBFIXEDPTMATH_CORE} ${PATCH_CORE})
+add_library(reactphysics3d SHARED ${REACTPHYSICS3D_HEADERS} ${REACTPHYSICS3D_SOURCES} ${LIBFIXEDPTMATH_CORE} ${PATCH_CORE})
 
 # Creates an Alias Target, such that "ReactPhysics3D::reactphysics3d" can be used
 # to refer to "reactphysics3d" in subsequent commands
@@ -370,3 +371,5 @@ install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/ReactPhysics3DConfigVersion.cmake
     DESTINATION lib/cmake/ReactPhysics3D
 )
+
+add_subdirectory(3rd/lua/src)

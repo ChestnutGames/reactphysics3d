@@ -588,7 +588,8 @@ struct Stack<reactphysics3d::AABB const&> : Stack<reactphysics3d::AABB> {
 
 } // namespace luabridge
 
-int luaopen_fixmath_reactphysics3d(lua_State* L)
+LUAMOD_API
+int luaopen_reactphysics3d(lua_State* L)
 {
 
     luabridge::getGlobalNamespace(L)
@@ -609,15 +610,12 @@ int luaopen_fixmath_reactphysics3d(lua_State* L)
         .deriveClass<reactphysics3d::ConvexShape, reactphysics3d::CollisionShape>("ConvexShape")
         .endClass()
         .deriveClass<reactphysics3d::CapsuleShape, reactphysics3d::ConvexShape>("CapsuleShape")
-        .addConstructor<void (*)(reactphysics3d::decimal, reactphysics3d::decimal)>()
         .endClass()
         .deriveClass<reactphysics3d::SphereShape, reactphysics3d::ConvexShape>("SphereShape")
-        .addConstructor<void (*)(reactphysics3d::decimal)>()
         .endClass()
         .deriveClass<reactphysics3d::ConvexPolyhedronShape, reactphysics3d::ConvexShape>("ConvexPolyhedronShape")
         .endClass()
         .deriveClass<reactphysics3d::BoxShape, reactphysics3d::ConvexPolyhedronShape>("BoxShape")
-        .addConstructor<void (*)(const reactphysics3d::Vector3&)>()
         .endClass()
         .deriveClass<reactphysics3d::TriangleShape, reactphysics3d::ConvexPolyhedronShape>("TriangleShape")
         .endClass()
@@ -632,7 +630,6 @@ int luaopen_fixmath_reactphysics3d(lua_State* L)
 
         // engine
         .beginClass<reactphysics3d::PhysicsWorld>("PhysicsWorld")
-        .addConstructor<void (*)()>()
         .addFunction("createCollisionBody", &reactphysics3d::PhysicsWorld::createCollisionBody)
         .addFunction("destroyCollisionBody", &reactphysics3d::PhysicsWorld::destroyCollisionBody)
         .addFunction("getCollisionDispatch", &reactphysics3d::PhysicsWorld::getCollisionDispatch)
