@@ -371,5 +371,3 @@ install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/ReactPhysics3DConfigVersion.cmake
     DESTINATION lib/cmake/ReactPhysics3D
 )
-
-add_subdirectory(3rd/lua/src)
