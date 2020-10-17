@@ -24,18 +24,19 @@
 ********************************************************************************/
 
 #ifndef REACTPHYSICS3D_DECIMAL_H
-#define	REACTPHYSICS3D_DECIMAL_H
+#define REACTPHYSICS3D_DECIMAL_H
 
 /// ReactPhysiscs3D namespace
 namespace reactphysics3d {
 
-#if defined(IS_RP3D_DOUBLE_PRECISION_ENABLED)   // If we are compiling for double precision
-    using decimal = double;
-#else                                   // If we are compiling for single precision
-    using decimal = float;
+#if defined(IS_RP3D_DOUBLE_PRECISION_ENABLED) // If we are compiling for double precision
+using decimal = double;
+#else // If we are compiling for single precision
+using decimal = float;
+/*#include "../patch/b3r32.h"
+    using decimal = b3R32;*/
 #endif
 
 }
 
 #endif
-

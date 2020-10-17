@@ -6,7 +6,7 @@ extern "C" {
 #include <lauxlib.h>
 #include <lua.h>
 
-LUAMOD_API int luaopen_fixmath_reactphysics3d(lua_State* L);
+LUAMOD_API int luaopen_reactphysics3d(lua_State* L);
 
 #ifdef __cplusplus
 }
@@ -16,6 +16,98 @@ LUAMOD_API int luaopen_fixmath_reactphysics3d(lua_State* L);
 #include <LuaBridge\LuaBridge.h>
 #include <fix16.h>
 #include <reactphysics3d\reactphysics3d.h>
+
+static reactphysics3d::PhysicsCommon physicsCommon;
+
+class lCommon {
+public:
+    static reactphysics3d::PhysicsWorld* createPhysicsWorld()
+    {
+
+        // Create a physics world
+        reactphysics3d::PhysicsWorld* world = physicsCommon.createPhysicsWorld();
+        return world;
+    }
+    static void destroyPhysicsWorld(reactphysics3d::PhysicsWorld* world)
+    {
+        physicsCommon.destroyPhysicsWorld(world);
+    }
+
+    /// Create and return a sphere collision shape
+    static reactphysics3d::SphereShape* createSphereShape(const reactphysics3d::decimal radius)
+    {
+        return physicsCommon.createSphereShape(radius);
+    }
+
+    /// Destroy a sphere collision shape
+    static void destroySphereShape(reactphysics3d::SphereShape* sphereShape)
+    {
+        return physicsCommon.destroySphereShape(sphereShape);
+    }
+
+    /// Create and return a box collision shape
+    static reactphysics3d::BoxShape* createBoxShape(const reactphysics3d::Vector3& extent)
+    {
+        return physicsCommon.createBoxShape(extent);
+    }
+
+    /// Destroy a box collision shape
+    static void destroyBoxShape(reactphysics3d::BoxShape* boxShape)
+    {
+        physicsCommon.destroyBoxShape(boxShape);
+    }
+
+    /// Create and return a capsule shape
+    static reactphysics3d::CapsuleShape* createCapsuleShape(reactphysics3d::decimal radius, reactphysics3d::decimal height)
+    {
+        return physicsCommon.createCapsuleShape(radius, height);
+    }
+
+    /// Destroy a capsule collision shape
+    static void destroyCapsuleShape(reactphysics3d::CapsuleShape* capsuleShape)
+    {
+        physicsCommon.destroyCapsuleShape(capsuleShape);
+    }
+
+    /// Create and return a convex mesh shape
+    static reactphysics3d::ConvexMeshShape* createConvexMeshShape(reactphysics3d::PolyhedronMesh* polyhedronMesh, const reactphysics3d::Vector3& scaling = reactphysics3d::Vector3(1, 1, 1))
+    {
+        return physicsCommon.createConvexMeshShape(polyhedronMesh, scaling);
+    }
+
+    /// Destroy a convex mesh shape
+    static void destroyConvexMeshShape(reactphysics3d::ConvexMeshShape* convexMeshShape)
+    {
+        physicsCommon.destroyConvexMeshShape(convexMeshShape);
+    }
+
+    /// Create and return a height-field shape
+    static reactphysics3d::HeightFieldShape* createHeightFieldShape(int nbGridColumns, int nbGridRows, reactphysics3d::decimal minHeight, reactphysics3d::decimal maxHeight,
+        const void* heightFieldData, reactphysics3d::HeightFieldShape::HeightDataType dataType,
+        int upAxis = 1, reactphysics3d::decimal integerHeightScale = 1.0f,
+        const reactphysics3d::Vector3& scaling = reactphysics3d::Vector3(1, 1, 1))
+    {
+        return physicsCommon.createHeightFieldShape(nbGridColumns, nbGridRows, minHeight, maxHeight, heightFieldData, dataType, upAxis, integerHeightScale, scaling);
+    }
+
+    /// Destroy a height-field shape
+    static void destroyHeightFieldShape(reactphysics3d::HeightFieldShape* heightFieldShape)
+    {
+        physicsCommon.destroyHeightFieldShape(heightFieldShape);
+    }
+
+    /// Create and return a concave mesh shape
+    static reactphysics3d::ConcaveMeshShape* createConcaveMeshShape(reactphysics3d::TriangleMesh* triangleMesh, const reactphysics3d::Vector3& scaling = reactphysics3d::Vector3(1, 1, 1))
+    {
+        return physicsCommon.createConcaveMeshShape(triangleMesh, scaling);
+    }
+
+    /// Destroy a concave mesh shape
+    void destroyConcaveMeshShape(reactphysics3d::ConcaveMeshShape* concaveMeshShape)
+    {
+        physicsCommon.destroyConcaveMeshShape(concaveMeshShape);
+    }
+};
 
 class lEventListener : public reactphysics3d::EventListener {
 public:
@@ -74,6 +166,9 @@ private:
 };
 
 static int
+lr32new(lua_State* L, int32_t const& i);
+
+static int
 lr32add(lua_State* L)
 {
     lua_settop(L, 2);
@@ -82,11 +177,7 @@ lr32add(lua_State* L)
     lua_getfield(L, 2, "__i__");
     lua_Integer b = luaL_checkinteger(L, -1);
     fix16_t v = fix16_sadd((fix16_t)a, (fix16_t)b);
-    lua_createtable(L, 0, 1);
-    lua_pushinteger(L, v);
-    lua_setfield(L, -2, "__i__");
-    lua_getmetatable(L, 1);
-    lua_setmetatable(L, -2);
+    lr32new(L, v);
     return 1;
 }
 
@@ -99,11 +190,7 @@ lr32sub(lua_State* L)
     lua_getfield(L, 2, "__i__");
     lua_Integer b = luaL_checkinteger(L, -1);
     fix16_t v = fix16_ssub((fix16_t)a, (fix16_t)b);
-    lua_createtable(L, 0, 1);
-    lua_pushinteger(L, v);
-    lua_setfield(L, -2, "__i__");
-    lua_getmetatable(L, 1);
-    lua_setmetatable(L, -2);
+    lr32new(L, v);
     return 1;
 }
 
@@ -116,11 +203,7 @@ lr32mul(lua_State* L)
     lua_getfield(L, 2, "__i__");
     lua_Integer b = luaL_checkinteger(L, -1);
     fix16_t v = fix16_smul((fix16_t)a, (fix16_t)b);
-    lua_createtable(L, 0, 1);
-    lua_pushinteger(L, v);
-    lua_setfield(L, -2, "__i__");
-    lua_getmetatable(L, 1);
-    lua_setmetatable(L, -2);
+    lr32new(L, v);
     return 1;
 }
 
@@ -133,11 +216,7 @@ lr32div(lua_State* L)
     lua_getfield(L, 2, "__i__");
     lua_Integer b = luaL_checkinteger(L, -1);
     fix16_t v = fix16_sdiv((fix16_t)a, (fix16_t)b);
-    lua_createtable(L, 0, 1);
-    lua_pushinteger(L, v);
-    lua_setfield(L, -2, "__i__");
-    lua_getmetatable(L, 1);
-    lua_setmetatable(L, -2);
+    lr32new(L, v);
     return 1;
 }
 
@@ -148,7 +227,7 @@ lr32tostring(lua_State* L)
     lua_getfield(L, 1, "__i__");
     lua_Integer a = luaL_checkinteger(L, -1);
     float f = fix16_to_float(a);
-    char buffer[128] = { 0 };
+    char buffer[128] = {0};
     snprintf(buffer, 128, "fp: %f", f);
     lua_pushstring(L, buffer);
     return 1;
@@ -171,6 +250,27 @@ printTable(lua_State* L)
     }
 }
 
+static int
+lr32new(lua_State* L, int32_t const& i)
+{
+    // 跟多是查看数据
+    lua_createtable(L, 0, 1);
+    lua_pushinteger(L, i);
+    lua_setfield(L, -2, "__i__");
+    // meta
+    luaL_Reg l[] = {
+        {"__add", lr32add},
+        {"__sub", lr32sub},
+        {"__mul", lr32mul},
+        {"__div", lr32div},
+        {"__tostring", lr32tostring},
+        {NULL, NULL},
+    };
+    luaL_newlib(L, l);
+    lua_setmetatable(L, -2);
+    return 0;
+}
+
 namespace luabridge {
 
 // math
@@ -178,21 +278,7 @@ template <>
 struct Stack<b3R32> {
     static void push(lua_State* L, b3R32 const& r)
     {
-        // 跟多是查看数据
-        lua_createtable(L, 0, 1);
-        lua_pushinteger(L, r._i);
-        lua_setfield(L, -2, "__i__");
-        // meta
-        luaL_Reg l[] = {
-            { "__add", lr32add },
-            { "__sub", lr32sub },
-            { "__mul", lr32mul },
-            { "__div", lr32div },
-            { "__tostring", lr32tostring },
-            { NULL, NULL },
-        };
-        luaL_newlib(L, l);
-        lua_setmetatable(L, -2);
+        lr32new(L, r._i);
         lua_getfield(L, -1, "__i__");
         assert(luaL_checkinteger(L, -1) == r._i);
         lua_pop(L, 1);
@@ -591,6 +677,7 @@ struct Stack<reactphysics3d::AABB const&> : Stack<reactphysics3d::AABB> {
 LUAMOD_API
 int luaopen_reactphysics3d(lua_State* L)
 {
+    luaL_checkversion(L);
 
     luabridge::getGlobalNamespace(L)
         .beginNamespace("rp3d")
@@ -600,9 +687,16 @@ int luaopen_reactphysics3d(lua_State* L)
         .addFunction("setTransform", &reactphysics3d::CollisionBody::setTransform)
         .endClass()
         .deriveClass<reactphysics3d::RigidBody, reactphysics3d::CollisionBody>("RigidBody")
+        .addFunction("getTransform", &reactphysics3d::RigidBody::getTransform)
+        .addFunction("setTransform", &reactphysics3d::RigidBody::setTransform)
         .addFunction("getMass", &reactphysics3d::RigidBody::getMass)
-        .addFunction("getLinearVelocity", &reactphysics3d::RigidBody::getLinearVelocity)
         .addFunction("setMass", &reactphysics3d::RigidBody::setMass)
+        .addFunction("getLinearVelocity", &reactphysics3d::RigidBody::getLinearVelocity)
+        .addFunction("setLinearVelocity", &reactphysics3d::RigidBody::setLinearVelocity)
+        .addFunction("getAngularVelocity", &reactphysics3d::RigidBody::getAngularVelocity)
+        .addFunction("setAngularVelocity", &reactphysics3d::RigidBody::setAngularVelocity)
+        .addFunction("getLocalInertiaTensor", &reactphysics3d::RigidBody::getLocalInertiaTensor)
+        .addFunction("setLocalInertiaTensor", &reactphysics3d::RigidBody::setLocalInertiaTensor)
         .endClass()
         // shape
         .beginClass<reactphysics3d::CollisionShape>("CollisionShape")
@@ -634,6 +728,7 @@ int luaopen_reactphysics3d(lua_State* L)
         .addFunction("destroyCollisionBody", &reactphysics3d::PhysicsWorld::destroyCollisionBody)
         .addFunction("getCollisionDispatch", &reactphysics3d::PhysicsWorld::getCollisionDispatch)
         .addFunction("raycast", &reactphysics3d::PhysicsWorld::raycast)
+        .addFunction("getName", &reactphysics3d::PhysicsWorld::getName)
         .addFunction("update", &reactphysics3d::PhysicsWorld::update)
         .addFunction("getNbIterationsVelocitySolver", &reactphysics3d::PhysicsWorld::getNbIterationsVelocitySolver)
         .addFunction("setNbIterationsVelocitySolver", &reactphysics3d::PhysicsWorld::setNbIterationsVelocitySolver)
@@ -682,6 +777,9 @@ int luaopen_reactphysics3d(lua_State* L)
         .deriveClass<lEventListener, reactphysics3d::EventListener>("lEventListener")
         .addConstructor<void (*)()>()
         .addCFunction("lregister", &lEventListener::lregister)
+        .endClass()
+        .beginClass<lCommon>("lCommon")
+        .addStaticFunction("createPhysicsWorld", &lCommon::createPhysicsWorld)
         .endClass()
         .endNamespace();
     return 0;

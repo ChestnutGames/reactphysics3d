@@ -287,6 +287,8 @@ add_library(ReactPhysics3D::reactphysics3d ALIAS reactphysics3d)
 # C++11 compiler features
 target_compile_features(reactphysics3d PUBLIC cxx_std_11)
 set_target_properties(reactphysics3d PROPERTIES CXX_EXTENSIONS OFF)
+set_target_properties(reactphysics3d PROPERTIES ARCHIVE_OUTPUT_DIRECTORY_DEBUG ../../luaclib)
+set_target_properties(reactphysics3d PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ../../luaclib)
 
 # Compile with warning messages
 target_compile_options(reactphysics3d PRIVATE
@@ -298,7 +300,7 @@ target_compile_options(reactphysics3d PRIVATE
 target_include_directories(reactphysics3d PUBLIC
               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/3rd>
-              $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/3rd/lua/src>
+              $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../lua/src>
               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libfixmath>
               $<INSTALL_INTERFACE:include>
 )
@@ -328,6 +330,11 @@ set_target_properties(reactphysics3d  PROPERTIES
           VERSION "0.8.0" 
           SOVERSION "0.8"
 )
+
+if (MSVC)
+	target_compile_definitions (reactphysics3d PRIVATE LUA_BUILD_AS_DLL)
+endif ()
+target_link_libraries(reactphysics3d ../../liblua)
 
 # Install target (install library only, not headers)
 install(TARGETS reactphysics3d

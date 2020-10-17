@@ -640,12 +640,12 @@ inline void PhysicsWorld::setContactsPositionCorrectionTechnique(
  */
 inline void PhysicsWorld::setJointsPositionCorrectionTechnique(
                               JointsPositionCorrectionTechnique technique) {
-    if (technique == JointsPositionCorrectionTechnique::BAUMGARTE_JOINTS) {
+    /*if (technique == JointsPositionCorrectionTechnique::BAUMGARTE_JOINTS) {
         mConstraintSolverSystem.setIsNonLinearGaussSeidelPositionCorrectionActive(false);
     }
     else {
         mConstraintSolverSystem.setIsNonLinearGaussSeidelPositionCorrectionActive(true);
-    }
+    }*/
 }
 
 // Return the gravity vector of the world
