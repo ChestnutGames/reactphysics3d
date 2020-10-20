@@ -13,9 +13,9 @@ LUAMOD_API int luaopen_reactphysics3d(lua_State* L);
 #endif
 
 #include "b3r32.h"
-#include <LuaBridge\LuaBridge.h>
+#include <LuaBridge/LuaBridge.h>
 #include <fix16.h>
-#include <reactphysics3d\reactphysics3d.h>
+#include <reactphysics3d/reactphysics3d.h>
 
 static reactphysics3d::PhysicsCommon physicsCommon;
 
@@ -683,8 +683,12 @@ int luaopen_reactphysics3d(lua_State* L)
         .beginNamespace("rp3d")
         // body
         .beginClass<reactphysics3d::CollisionBody>("CollisionBody")
+        .addFunction("isActive", &reactphysics3d::CollisionBody::isActive)
         .addFunction("getTransform", &reactphysics3d::CollisionBody::getTransform)
         .addFunction("setTransform", &reactphysics3d::CollisionBody::setTransform)
+        .addFunction("addCollider", &reactphysics3d::CollisionBody::addCollider)
+        .addFunction("removeCollider", &reactphysics3d::CollisionBody::removeCollider)
+        //.addFunction("getCollider", &reactphysics3d::CollisionBody::getCollider)
         .endClass()
         .deriveClass<reactphysics3d::RigidBody, reactphysics3d::CollisionBody>("RigidBody")
         .addFunction("getTransform", &reactphysics3d::RigidBody::getTransform)
@@ -697,6 +701,21 @@ int luaopen_reactphysics3d(lua_State* L)
         .addFunction("setAngularVelocity", &reactphysics3d::RigidBody::setAngularVelocity)
         .addFunction("getLocalInertiaTensor", &reactphysics3d::RigidBody::getLocalInertiaTensor)
         .addFunction("setLocalInertiaTensor", &reactphysics3d::RigidBody::setLocalInertiaTensor)
+        .addFunction("getType", &reactphysics3d::RigidBody::getType)
+        .addFunction("setType", &reactphysics3d::RigidBody::setType)
+        .addFunction("isGravityEnabled", &reactphysics3d::RigidBody::isGravityEnabled)
+        .addFunction("enableGravity", &reactphysics3d::RigidBody::enableGravity)
+        .addFunction("getLinearDamping", &reactphysics3d::RigidBody::getLinearDamping)
+        .addFunction("setLinearDamping", &reactphysics3d::RigidBody::setLinearDamping)
+        .addFunction("getAngularDamping", &reactphysics3d::RigidBody::getAngularDamping)
+        .addFunction("setAngularDamping", &reactphysics3d::RigidBody::setAngularDamping)
+        .addFunction("addCollider", &reactphysics3d::RigidBody::addCollider)
+        .addFunction("removeCollider", &reactphysics3d::RigidBody::removeCollider)
+        .endClass()
+        .beginClass<reactphysics3d::Collider>("Collider")
+        /*.addFunction("getLocalToBodyTransform", &reactphysics3d::Collider::getLocalToBodyTransform)
+        .addFunction("setLocalToBodyTransform", &reactphysics3d::Collider::setLocalToBodyTransform)
+        .addFunction("getLocalToWorldTransform", &reactphysics3d::Collider::getLocalToWorldTransform)*/
         .endClass()
         // shape
         .beginClass<reactphysics3d::CollisionShape>("CollisionShape")
@@ -780,6 +799,19 @@ int luaopen_reactphysics3d(lua_State* L)
         .endClass()
         .beginClass<lCommon>("lCommon")
         .addStaticFunction("createPhysicsWorld", &lCommon::createPhysicsWorld)
+        .addStaticFunction("destroyPhysicsWorld", &lCommon::destroyPhysicsWorld)
+        .addStaticFunction("createSphereShape", &lCommon::createSphereShape)
+        .addStaticFunction("destroySphereShape", &lCommon::destroySphereShape)
+        .addStaticFunction("createBoxShape", &lCommon::createBoxShape)
+        .addStaticFunction("destroyBoxShape", &lCommon::destroyBoxShape)
+        .addStaticFunction("createCapsuleShape", &lCommon::createCapsuleShape)
+        .addStaticFunction("destroyCapsuleShape", &lCommon::destroyCapsuleShape)
+        /*.addStaticFunction("createConvexMeshShape", &lCommon::createConvexMeshShape)
+        .addStaticFunction("destroyConvexMeshShape", &lCommon::destroyConvexMeshShape)*/
+        /*.addStaticFunction("createHeightFieldShape", &lCommon::createHeightFieldShape)
+        .addStaticFunction("destroyHeightFieldShape", &lCommon::destroyHeightFieldShape)*/
+        /*.addStaticFunction("createConcaveMeshShape", &lCommon::createConcaveMeshShape)
+        .addStaticFunction("destroyConcaveMeshShape", &lCommon::destroyConcaveMeshShape)*/
         .endClass()
         .endNamespace();
     return 0;
